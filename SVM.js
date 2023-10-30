@@ -1,3 +1,11 @@
+/*
+
+Please paste the code into Google Earth Engine Code Editor. 
+Import your boundaries, training and validation data regarding the land cover classes.
+Choose specific classifier that you want to clasify your data. (SVM, Random Forest, CART, NaiveBayes)
+
+*/
+
 // import the boundaries
 // filtering
 
@@ -136,13 +144,38 @@ function maskS2clouds(image) {
     return l.add(f.set("fold",l.size().divide(training.size())))
   },[])));
   
-  // train the classifier 
+  // TRAIN THE CLASSIFIER
+  // SVM 
   
   var classifier = ee.Classifier.libsvm({
     kernelType: 'RBF',
     gamma: 0.1,
     cost: 1000
   });
+
+  /*
+  RANDOM FOREST
+
+  var classifier = ee.Classifier.smileRandomForest(500)});
+
+  Number of the trees were selected as 500 based on the litature review. 
+
+  */
+
+  /*
+  CART
+
+  var classifier = ee.Classifier.smileCart();
+
+  */
+
+  /*
+
+  Naive Bayes
+
+  var classifier = ee.Classifier.smileNaiveBayes(); 
+
+  */
   
   
   var trained = classifier.train(training, classProperty, bands);
@@ -172,7 +205,7 @@ function maskS2clouds(image) {
   Map.addLayer(classified, {min: 0, max: 10, palette: palette}, 'LCLU');
   
   // K-FOLD CROSS VALIDATION 
-  
+
   var k = 5;
   var kfoldClassified = ee.ImageCollection(
     ee.List.sequence(0, k-1).map(
